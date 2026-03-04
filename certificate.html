@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact Certificate</title>
+<style>
+body{
+background:#f4f4f4;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:'Poppins';
+}
+
+.certificate{
+background:white;
+padding:60px;
+border:10px solid #198754;
+width:700px;
+text-align:center;
+box-shadow:0 20px 50px rgba(0,0,0,0.2);
+}
+
+h1{
+color:#0f5132;
+}
+
+</style>
+</head>
+<body>
+
+<div class="certificate">
+<h1>Certificate of Environmental Contribution</h1>
+<p>This certificate is proudly awarded to</p>
+<h2 id="name"></h2>
+<p>For outstanding commitment towards sustainability initiatives in India 🇮🇳</p>
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+document.getElementById("name").innerText=user.email;
+</script>
+
+</body>
+</html>

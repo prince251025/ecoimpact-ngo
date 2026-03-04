@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="login-section">
+
+<div class="login-card">
+
+<h2>EcoImpact NGO 🌱</h2>
+
+<input type="text" id="name" placeholder="Full Name (For Register)" style="display:none;">
+<input type="email" id="email" placeholder="Enter Email" required>
+<input type="password" id="password" placeholder="Enter Password" required>
+
+<button onclick="login()">Login</button>
+
+<p style="text-align:center;margin-top:15px;">
+  Don’t have an account?
+  <a href="#" onclick="registerUser()">Create Account</a>
+</p>
+<button onclick="register()" id="registerBtn" style="margin-top:10px; background:#66bb6a;">
+Create Account
+</button>
+
+<p style="margin-top:15px; font-size:14px;">
+Don't have an account? Click Create Account
+</p>
+
+</div>
+
+<script>
+
+// LOGIN
+async function login(){
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  try {
+    const res = await fetch("http://localhost:5000/login",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email,password})
+    });
+
+    const data = await res.json();
+
+    console.log(data); // 🔥 ADD THIS FOR DEBUG
+
+    if(data.success){
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      if(data.user.role === "admin"){
+        window.location.href="admin.html";
+      }else{
+        window.location.href="dashboard.html";
+      }
+
+    }else{
+      alert(data.message);
+    }
+
+  } catch(err){
+    alert("Server not reachable ❌");
+    console.log(err);
+  }
+}
+
+async function registerUser(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
+
+  const res = await fetch("/register",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
+  });
+
+  const data = await res.json();
+  alert(data.message);
+}
+
+// REGISTER
+async function register(){
+
+  const name = document.getElementById("name");
+  name.style.display="block";
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if(!email || !password){
+    alert("Please enter email & password first");
+    return;
+  }
+
+  const res = await fetch("http://localhost:5000/register",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      email,
+      password,
+      role:"volunteer",
+      name:name.value || "Volunteer"
+    })
+  });
+
+  const data = await res.json();
+
+  alert(data.message);
+}
+
+</script>
+
+</body>
+</html>

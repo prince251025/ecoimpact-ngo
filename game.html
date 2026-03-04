@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact - Tree Rescue Mission</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:linear-gradient(to right,#2e7d32,#66bb6a);
+color:white;
+text-align:center;
+overflow:hidden;
+}
+
+.header{
+padding:20px;
+}
+
+.stats{
+display:flex;
+justify-content:center;
+gap:30px;
+font-size:18px;
+margin-bottom:10px;
+}
+
+#gameArea{
+position:relative;
+width:100%;
+height:70vh;
+background:rgba(255,255,255,0.1);
+overflow:hidden;
+border-top:3px solid white;
+}
+
+.tree{
+position:absolute;
+font-size:40px;
+cursor:pointer;
+transition:transform 0.2s;
+}
+
+.tree:hover{
+transform:scale(1.2);
+}
+
+button{
+padding:10px 20px;
+border:none;
+background:white;
+color:#2e7d32;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+opacity:0.8;
+}
+
+#gameOver{
+display:none;
+margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>🌍 Tree Rescue Mission</h1>
+
+<div class="stats">
+<div>Score: <span id="score">0</span></div>
+<div>Time: <span id="time">30</span>s</div>
+<div>Combo: <span id="combo">0</span>x</div>
+</div>
+
+<button onclick="startGame()">Start Mission</button>
+<button onclick="goBack()">⬅ Dashboard</button>
+
+</div>
+
+<div id="gameArea"></div>
+
+<div id="gameOver">
+<h2>Mission Completed 🌱</h2>
+<p>You planted <span id="finalScore"></span> trees!</p>
+<button onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+
+const user = JSON.parse(localStorage.getItem("user"));
+if(!user){
+window.location.href="login.html";
+}
+const email = user.email;
+
+let score=0;
+let time=30;
+let combo=0;
+let gameInterval;
+let spawnInterval;
+
+function startGame(){
+score=0;
+time=30;
+combo=0;
+document.getElementById("score").innerText=0;
+document.getElementById("time").innerText=30;
+document.getElementById("combo").innerText=0;
+document.getElementById("gameOver").style.display="none";
+
+spawnInterval=setInterval(spawnTree,800);
+gameInterval=setInterval(updateTimer,1000);
+}
+
+function spawnTree(){
+const tree=document.createElement("div");
+tree.classList.add("tree");
+tree.innerText="🌳";
+
+tree.style.left=Math.random()*90+"%";
+tree.style.top=Math.random()*80+"%";
+
+tree.onclick=function(){
+score+=1+(combo);
+combo++;
+document.getElementById("score").innerText=score;
+document.getElementById("combo").innerText=combo;
+tree.remove();
+};
+
+document.getElementById("gameArea").appendChild(tree);
+
+setTimeout(()=>{
+if(tree.parentNode){
+tree.remove();
+combo=0;
+document.getElementById("combo").innerText=0;
+}
+},1500);
+}
+
+function updateTimer(){
+time--;
+document.getElementById("time").innerText=time;
+
+if(time<=0){
+clearInterval(gameInterval);
+clearInterval(spawnInterval);
+endGame();
+}
+}
+
+function endGame(){
+document.getElementById("gameOver").style.display="block";
+document.getElementById("finalScore").innerText=score;
+
+fetch("http://localhost:5000/add-points",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,points:score})
+});
+}
+
+function goBack(){
+window.location.href="dashboard.html";
+}
+
+</script>
+
+</body>
+</html>

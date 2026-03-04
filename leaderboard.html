@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Leaderboard</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<h2 style="text-align:center;margin-top:40px;">Top Volunteers 🏆</h2>
+
+<ul id="board" style="max-width:600px;margin:auto;"></ul>
+
+<script>
+async function loadBoard(){
+const res = await fetch("http://localhost:5000/users");
+const users = await res.json();
+
+users.sort((a,b)=>b.points-a.points);
+
+let list=document.getElementById("board");
+list.innerHTML="";
+
+users.forEach((u,i)=>{
+list.innerHTML+=`<li style="padding:10px;">${i+1}. ${u.email} - ${u.points} pts</li>`;
+});
+}
+
+loadBoard();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact | Volunteer Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.profile-card{
+background:white;
+width:450px;
+padding:40px;
+border-radius:20px;
+box-shadow:0 20px 40px rgba(0,0,0,0.15);
+text-align:center;
+transition:0.3s;
+}
+
+.profile-card:hover{
+transform:translateY(-8px);
+}
+
+.profile-icon{
+font-size:60px;
+margin-bottom:15px;
+}
+
+h2{
+color:#2e7d32;
+margin-bottom:25px;
+}
+
+.stat{
+display:flex;
+justify-content:space-between;
+margin:12px 0;
+font-weight:500;
+}
+
+.badge{
+background:#2e7d32;
+color:white;
+padding:8px 15px;
+border-radius:20px;
+display:inline-block;
+margin-top:15px;
+}
+
+button{
+margin-top:25px;
+padding:10px 20px;
+background:#2e7d32;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#1b5e20;
+}
+</style>
+</head>
+
+<body>
+
+<div class="profile-card">
+
+<div class="profile-icon">👤</div>
+
+<h2>Volunteer Profile</h2>
+
+<div class="stat">
+<span>Email:</span>
+<span id="email"></span>
+</div>
+
+<div class="stat">
+<span>Points:</span>
+<span id="points"></span>
+</div>
+
+<div class="stat">
+<span>Attendance:</span>
+<span id="attendance"></span>
+</div>
+
+<div class="stat">
+<span>Total Hours:</span>
+<span id="hours"></span>
+</div>
+
+<div class="badge" id="badge"></div>
+
+<button onclick="downloadCertificate()">🎓 Download Certificate</button>
+
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+window.location.href="login.html";
+}
+
+async function loadProfile(){
+const res = await fetch("http://localhost:5000/users");
+const users = await res.json();
+
+const current = users.find(u=>u.email===user.email);
+
+document.getElementById("email").innerText=current.email;
+document.getElementById("points").innerText=current.points || 0;
+document.getElementById("attendance").innerText=current.attendance || 0;
+document.getElementById("hours").innerText=current.totalHours || 0;
+document.getElementById("badge").innerText=current.badge || "Bronze 🥉";
+}
+
+function downloadCertificate(){
+alert("Certificate Generated 🎉 (Demo Version)");
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

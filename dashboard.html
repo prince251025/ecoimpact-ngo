@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact Volunteer Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--primary:#2e7d32;
+--secondary:#66bb6a;
+--light:#f4f9f4;
+--dark:#121212;
+--card:#ffffff;
+--card-dark:#1e1e1e;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+display:flex;
+background:var(--light);
+transition:0.3s;
+}
+
+.dark{
+background:var(--dark);
+color:white;
+}
+
+.sidebar{
+width:240px;
+height:100vh;
+background:var(--primary);
+color:white;
+padding:30px 20px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:40px;
+text-align:center;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin:15px 0;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+padding-left:8px;
+}
+
+.sidebar button{
+margin-top:20px;
+width:100%;
+}
+
+.main{
+margin-left:240px;
+padding:40px;
+width:100%;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.card{
+background:var(--card);
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+margin-bottom:25px;
+transition:0.3s;
+}
+
+.dark .card{
+background:var(--card-dark);
+}
+
+.stats{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.stat-box{
+flex:1;
+min-width:200px;
+text-align:center;
+}
+
+.stat-box h3{
+color:var(--primary);
+margin-bottom:10px;
+}
+
+button{
+padding:10px 15px;
+border:none;
+background:var(--primary);
+color:white;
+border-radius:6px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+opacity:0.85;
+}
+
+input[type="file"]{
+margin-bottom:10px;
+}
+
+.progress-container{
+width:100%;
+height:20px;
+background:#ddd;
+border-radius:20px;
+overflow:hidden;
+margin:10px 0;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:var(--secondary);
+transition:0.5s;
+}
+
+.status{
+margin-top:10px;
+font-weight:600;
+color:var(--primary);
+}
+
+@media(max-width:768px){
+.sidebar{
+position:relative;
+width:100%;
+height:auto;
+}
+.main{
+margin-left:0;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>🌍 EcoImpact</h2>
+<a href="index.html">🏠 Home</a>
+<a href="game.html">🎮 Eco Game</a>
+<a href="admin.html">📊 Admin</a>
+<button onclick="toggleTheme()">🌙 Toggle Theme</button>
+<button onclick="logout()">🚪 Logout</button>
+</div>
+
+<div class="main">
+
+<div class="header">
+<h1>Volunteer Dashboard</h1>
+<div id="welcomeUser"></div>
+</div>
+
+<div class="stats">
+
+<div class="card stat-box">
+<h3>🌱 Points</h3>
+<p id="points">0</p>
+</div>
+
+<div class="card stat-box">
+<h3>📅 Attendance</h3>
+<p id="attendance">0</p>
+</div>
+
+<div class="card stat-box">
+<h3>🏅 Badge</h3>
+<p id="badge">Bronze 🥉</p>
+</div>
+
+</div>
+
+<div class="card">
+<h3>⏱ Attendance System</h3>
+<button onclick="punchIn()">Punch In</button>
+<button onclick="punchOut()">Punch Out</button>
+<p class="status" id="attendanceStatus"></p>
+</div>
+
+<div class="card">
+<h3>📸 Upload Environmental Activity Proof</h3>
+<form id="uploadForm" enctype="multipart/form-data">
+<input type="file" name="image" required>
+<br>
+<button type="submit">Upload Proof</button>
+</form>
+</div>
+
+<div class="card">
+<h3>🌟 Progress to Gold Badge</h3>
+<div class="progress-container">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+<p id="progressText">0%</p>
+</div>
+
+</div>
+
+<script>
+
+// ================= USER SESSION =================
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if(!user){
+    window.location.href="login.html";
+}
+
+const email = user.email;
+document.getElementById("welcomeUser").innerText = "Welcome, " + email;
+
+
+// ================= THEME =================
+
+function toggleTheme(){
+    document.body.classList.toggle("dark");
+}
+
+
+// ================= LOGOUT =================
+
+function logout(){
+    localStorage.removeItem("user");
+    window.location.href="login.html";
+}
+
+
+// ================= LOAD USER DATA =================
+
+async function loadUser(){
+    try{
+        const res = await fetch("/users");
+        const users = await res.json();
+
+        const current = users.find(u=>u.email===email);
+        if(!current) return;
+
+        document.getElementById("points").innerText = current.points || 0;
+        document.getElementById("attendance").innerText = current.attendance || 0;
+        document.getElementById("badge").innerText = current.badge || "Bronze 🥉";
+
+        updateProgress(current.points || 0);
+    }
+    catch(err){
+        console.log("Server not reachable");
+    }
+}
+
+
+// ================= PROGRESS =================
+
+function updateProgress(points){
+    let percent = Math.min(points,100);
+    document.getElementById("progressBar").style.width = percent + "%";
+    document.getElementById("progressText").innerText = percent + "% to Gold Badge";
+}
+  
+
+// ================= ATTENDANCE TIMER =================
+
+let timerInterval;
+let startTime;
+
+async function punchIn(){
+
+    startTime = new Date();
+    localStorage.setItem("punchStart", startTime);
+
+    await fetch("/punch-in",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email})
+    });
+
+    document.getElementById("attendanceStatus").innerText="🟢 Working...";
+
+    timerInterval = setInterval(()=>{
+        const now = new Date();
+        const diff = Math.floor((now - new Date(localStorage.getItem("punchStart"))) / 1000);
+        document.getElementById("attendanceStatus").innerText = 
+        "🟢 Working... " + diff + " sec";
+    },1000);
+}
+
+
+async function punchOut(){
+
+    clearInterval(timerInterval);
+
+    await fetch("/punch-out",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email})
+    });
+
+    document.getElementById("attendanceStatus").innerText="✅ Attendance Completed";
+
+    localStorage.removeItem("punchStart");
+
+    loadUser();
+}
+
+
+// ================= IMAGE UPLOAD =================
+
+document.getElementById("uploadForm").onsubmit = async function(e){
+
+    e.preventDefault();
+
+    let formData = new FormData(this);
+    formData.append("email", email);
+
+    const res = await fetch("/upload",{
+        method:"POST",
+        body:formData
+    });
+
+    const data = await res.json();
+
+    document.getElementById("attendanceStatus").innerText = data.message;
+
+    loadUser();
+};
+
+
+// ================= AUTO LOAD =================
+
+loadUser();
+
+</script>
+
+</body>
+</html>

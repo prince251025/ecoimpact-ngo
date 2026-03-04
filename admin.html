@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+display:flex;
+background:#f4f9f4;
+}
+
+/* ========== SIDEBAR ========== */
+
+.sidebar{
+width:240px;
+height:100vh;
+background:#1b5e20;
+color:white;
+padding:30px 20px;
+position:fixed;
+}
+
+.sidebar h2{
+margin-bottom:40px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin:15px 0;
+transition:0.3s;
+}
+
+.sidebar a:hover{
+padding-left:8px;
+}
+
+/* ========== MAIN CONTENT ========== */
+
+.main{
+margin-left:240px;
+padding:40px;
+width:100%;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+margin-bottom:30px;
+}
+
+h1{
+margin-bottom:30px;
+color:#2e7d32;
+}
+
+h3{
+margin-bottom:15px;
+color:#2e7d32;
+}
+
+/* ========== LEADERBOARD TABLE ========== */
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th, td{
+padding:12px;
+text-align:left;
+}
+
+th{
+background:#66bb6a;
+color:white;
+}
+
+tr:nth-child(even){
+background:#f2f2f2;
+}
+
+button{
+padding:6px 12px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+font-weight:500;
+}
+
+.approve{
+background:#2e7d32;
+color:white;
+}
+
+.reject{
+background:#d32f2f;
+color:white;
+}
+
+textarea{
+width:100%;
+margin-top:5px;
+padding:5px;
+}
+
+/* ========== HISTORY SECTION ========== */
+
+.history-item{
+background:#f9f9f9;
+padding:10px;
+border-left:4px solid #2e7d32;
+margin-bottom:10px;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media(max-width:768px){
+.sidebar{
+position:relative;
+width:100%;
+height:auto;
+}
+.main{
+margin-left:0;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>🌍 EcoImpact Admin</h2>
+<a href="dashboard.html">Volunteer Dashboard</a>
+<a href="index.html">Home</a>
+</div>
+
+<div class="main">
+
+<h1>Admin Dashboard</h1>
+
+<div class="card">
+<h3>🏆 Real-Time Leaderboard</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Email</th>
+<th>Points</th>
+<th>Attendance</th>
+</tr>
+</thead>
+<tbody id="leaderboard"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3>📸 Pending Proof Approvals</h3>
+<div id="proofs"></div>
+</div>
+
+<div class="card">
+<h3>📜 Approval History</h3>
+<div id="history"></div>
+</div>
+
+</div>
+
+<script>
+
+// ================= LEADERBOARD =================
+
+async function loadLeaderboard(){
+const res = await fetch("http://localhost:5000/users");
+const users = await res.json();
+
+const table = document.getElementById("leaderboard");
+table.innerHTML="";
+
+users.forEach((u,i)=>{
+table.innerHTML+=`
+<tr>
+<td>${i+1}</td>
+<td>${u.email}</td>
+<td>${u.points}</td>
+<td>${u.attendance}</td>
+</tr>
+`;
+});
+}
+
+// ================= LOAD PROOFS =================
+
+async function loadProofs(){
+const res = await fetch("http://localhost:5000/db.json");
+const data = await res.json();
+
+const proofsDiv = document.getElementById("proofs");
+proofsDiv.innerHTML="";
+
+if(!data.proofs) return;
+
+data.proofs
+.filter(p=>p.status==="Pending")
+.forEach(p=>{
+proofsDiv.innerHTML+=`
+<div class="history-item">
+<b>${p.email}</b><br>
+<img src="http://localhost:5000/uploads/${p.filename}" width="200"><br>
+<textarea id="comment-${p.id}" placeholder="Add comment"></textarea><br>
+<button class="approve" onclick="approve(${p.id})">Approve</button>
+<button class="reject" onclick="reject(${p.id})">Reject</button>
+</div>
+`;
+});
+}
+
+// ================= APPROVE =================
+
+async function approve(id){
+const comment=document.getElementById(`comment-${id}`).value;
+
+await fetch("http://localhost:5000/approve-proof",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id, comment})
+});
+
+alert("Approved ✅");
+loadProofs();
+loadLeaderboard();
+}
+
+// ================= REJECT =================
+
+async function reject(id){
+const comment=document.getElementById(`comment-${id}`).value;
+
+await fetch("http://localhost:5000/reject-proof",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({id, comment})
+});
+
+alert("Rejected ❌");
+loadProofs();
+}
+
+// ================= HISTORY =================
+
+async function loadHistory(){
+const res = await fetch("http://localhost:5000/users");
+const users = await res.json();
+
+const historyDiv=document.getElementById("history");
+historyDiv.innerHTML="";
+
+users.forEach(u=>{
+if(u.history){
+u.history.forEach(h=>{
+historyDiv.innerHTML+=`
+<div class="history-item">
+<b>${u.email}</b> — ${h.type}<br>
+${new Date(h.date).toLocaleString()}<br>
+Comment: ${h.comment}
+</div>
+`;
+});
+}
+});
+}
+
+// ================= AUTO REFRESH =================
+
+setInterval(()=>{
+loadLeaderboard();
+loadProofs();
+loadHistory();
+},3000);
+
+loadLeaderboard();
+loadProofs();
+loadHistory();
+
+</script>
+
+</body>
+</html>

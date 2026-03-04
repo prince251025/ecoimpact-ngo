@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EcoImpact | Impact Gallery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f4f9f4;
+}
+
+header{
+background:#1b5e20;
+color:white;
+padding:20px 50px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+header h2{
+font-weight:700;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin-left:25px;
+font-weight:500;
+}
+
+.hero{
+text-align:center;
+padding:60px 20px;
+background:linear-gradient(135deg,#2e7d32,#66bb6a);
+color:white;
+}
+
+.hero h1{
+font-size:36px;
+margin-bottom:10px;
+}
+
+.gallery{
+padding:60px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:25px;
+}
+
+.card{
+background:white;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
+transition:0.4s;
+}
+
+.card:hover{
+transform:translateY(-10px);
+}
+
+.card img{
+width:100%;
+height:220px;
+object-fit:cover;
+}
+
+.card-content{
+padding:20px;
+}
+
+.card-content h3{
+color:#2e7d32;
+margin-bottom:10px;
+}
+
+footer{
+background:#1b5e20;
+color:white;
+text-align:center;
+padding:20px;
+margin-top:50px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>🌍 EcoImpact NGO</h2>
+<nav>
+<a href="dashboard.html">Dashboard</a>
+<a href="profile.html">Profile</a>
+</nav>
+</header>
+
+<section class="hero">
+<h1>Our Ground Impact Across India 🇮🇳</h1>
+<p>Real Volunteers. Real Change. Real Environmental Impact.</p>
+</section>
+
+<section class="gallery">
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1622547748225-3fc4abd2cca0" />
+<div class="card-content">
+<h3>Tree Plantation Drive</h3>
+<p>Over 500 trees planted in Maharashtra.</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1591197172062-c718f82aba20" />
+<div class="card-content">
+<h3>Beach Cleanup Campaign</h3>
+<p>Collected 1.2 tons plastic waste in Mumbai.</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1" />
+<div class="card-content">
+<h3>School Awareness Program</h3>
+<p>Educated 1000+ students on sustainability.</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1526045612212-70caf35c14df" />
+<div class="card-content">
+<h3>Community Clean Drive</h3>
+<p>Local youth participation from 6 cities.</p>
+</div>
+</div>
+
+</section>
+
+<footer>
+© 2026 EcoImpact NGO | Sustainable Future for India 🇮🇳
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,368 @@
+/* =======================================
+   🌍 EcoImpact NGO - Professional UI
+======================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #1b5e20;
+  --secondary: #2e7d32;
+  --accent: #66bb6a;
+  --light-bg: #f4f7f6;
+  --dark-bg: #121212;
+  --card-light: #ffffff;
+  --card-dark: #1e1e1e;
+  --text-dark: #333;
+  --text-light: #ffffff;
+  --shadow: 0 10px 25px rgba(0,0,0,0.08);
+  --radius: 18px;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--light-bg);
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+/* ================= HEADER ================= */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-left: 25px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+nav a:hover {
+  color: #c8facc;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+  height: 100vh;
+  background: linear-gradient(
+      rgba(0,0,0,0.6),
+      rgba(0,0,0,0.6)
+    ),
+    url("https://images.unsplash.com/photo-1597764699510-63c108f9d7d5");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.impact {
+  display: flex;
+  justify-content: space-around;
+  padding: 80px 20px;
+  background: #f4f9f4;
+  text-align: center;
+}
+
+.impact-box h2 {
+  font-size: 40px;
+  color: #1B5E20;
+}
+
+.gallery{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  padding:50px;
+}
+
+.gallery img{
+  width:100%;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+  transition:0.3s;
+}
+
+.gallery img:hover{
+  transform:scale(1.05);
+}
+
+footer{
+  background:#1B5E20;
+  color:white;
+  padding:25px;
+  text-align:center;
+}
+/* ================= FEATURES ================= */
+
+.features {
+  padding: 80px 60px;
+  text-align: center;
+}
+
+.features h2 {
+  margin-bottom: 50px;
+  font-size: 34px;
+  color: var(--secondary);
+}
+
+.feature-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: var(--card-light);
+  padding: 30px;
+  width: 320px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+.card h3 {
+  margin-bottom: 15px;
+  color: var(--secondary);
+}
+
+/* ================= DASHBOARD ================= */
+
+.dashboard {
+  padding: 40px;
+}
+
+.stats {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: var(--card-light);
+  padding: 25px;
+  border-radius: var(--radius);
+  flex: 1;
+  min-width: 220px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+}
+
+.stat-card h3 {
+  margin-bottom: 10px;
+  color: var(--secondary);
+  font-size: 18px;
+}
+
+.stat-card p {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* ================= ATTENDANCE ================= */
+
+.attendance-section,
+.task-section {
+  margin-top: 40px;
+}
+
+.task-card {
+  background: #e9f7ef;
+  padding: 15px 20px;
+  margin: 10px 0;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+}
+
+.task-card:hover {
+  background: #d4f5e4;
+}
+
+/* ================= BUTTONS ================= */
+
+button {
+  padding: 10px 18px;
+  background: var(--secondary);
+  border: none;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-weight: 500;
+}
+
+button:hover {
+  background: var(--primary);
+  transform: scale(1.05);
+}
+
+/* ================= LOGIN ================= */
+
+.login-section {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1d976c, #93f9b9);
+}
+
+.login-card {
+  background: white;
+  padding: 45px;
+  border-radius: var(--radius);
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  animation: fadeIn 0.6s ease;
+}
+
+.login-card h2 {
+  margin-bottom: 25px;
+  color: var(--secondary);
+}
+
+.login-card input {
+  width: 100%;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  transition: 0.3s;
+}
+
+.login-card input:focus {
+  border-color: var(--secondary);
+  outline: none;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ================= GAME ================= */
+
+.game-area {
+  width: 420px;
+  height: 420px;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  margin: 20px auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.bin {
+  width: 90px;
+  height: 22px;
+  background: var(--secondary);
+  position: absolute;
+  bottom: 10px;
+  left: 200px;
+  border-radius: 10px;
+}
+
+.plastic {
+  width: 22px;
+  height: 22px;
+  background: red;
+  position: absolute;
+  top: 0;
+  border-radius: 50%;
+}
+
+/* ================= PROGRESS BAR ================= */
+
+.progress-container {
+  width: 100%;
+  background: #ddd;
+  border-radius: 20px;
+  overflow: hidden;
+  height: 22px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2e7d32, #66bb6a);
+  transition: width 0.5s ease-in-out;
+}
+
+/* ================= DARK MODE ================= */
+
+.dark-mode {
+  background: var(--dark-bg);
+  color: white;
+}
+
+.dark-mode header {
+  background: #1e1e1e;
+}
+
+.dark-mode .card,
+.dark-mode .stat-card,
+.dark-mode .login-card {
+  background: var(--card-dark);
+  color: white;
+}
+
+.dark-mode button {
+  background: var(--accent);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats {
+    flex-direction: column;
+  }
+
+  .feature-container {
+    flex-direction: column;
+  }
+
+  .game-area {
+    width: 95%;
+  }
+}
