@@ -167,6 +167,12 @@ app.get("/users", (req, res) => {
 
 /* ---------------- START SERVER ---------------- */
 
-app.listen(5000, () => {
-  console.log("EcoImpact NGO Server Running on http://localhost:5000");
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/login.html");
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log("Server Running on port " + PORT);
 });
