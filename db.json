@@ -1,88 +1,132 @@
 {
   "users": [
     {
-      "id": 1772303329549,
+      "id": 1,
       "email": "admin@ecoimpact.org",
       "password": "admin123",
-      "role": "volunteer",
+      "role": "admin",
       "points": 0,
       "attendance": 0,
-      "level": 1,
-      "history": [],
-      "lastLocation": null,
-      "punchIn": null
+      "badge": "Admin"
     },
     {
-      "id": 1772304058109,
-      "email": "panchalprince2510@gmail.com",
-      "password": "@Prince@2006",
-      "role": "volunteer",
-      "points": 20,
-      "attendance": 4,
-      "level": 1,
-      "history": [
-        {
-          "type": "Admin Approval",
-          "date": "2026-03-01T17:55:33.762Z",
-          "comment": ""
-        }
-      ],
-      "lastLocation": null,
-      "punchIn": null
-    },
-    {
-      "id": 1772306188086,
+      "id": 1773528835698,
       "email": "tej123@gmail.com",
       "password": "12345678",
       "role": "volunteer",
-      "points": 0,
-      "attendance": 0,
-      "level": 1,
-      "history": [],
-      "lastLocation": null,
-      "punchIn": null
-    },
-    {
-      "id": 1772387448867,
-      "email": "sid123@gmail.com",
-      "password": "1234567890",
-      "role": "volunteer",
-      "points": 0,
-      "attendance": 0,
-      "level": 1,
-      "history": [],
-      "lastLocation": null,
-      "punchIn": null
-    },
-    {
-      "id": "97576552-5086-4607-b5a6-d8cea03eea32",
-      "email": "mani@gmail.com",
-      "password": "$2b$10$R4z3Qa10xTi9N71TIz/vUO7XGc/xnRFyqWXdYs0Vy.2IhE5K10SVu",
-      "role": "volunteer",
-      "points": 0,
-      "attendance": 0,
-      "totalHours": 0,
+      "points": 160,
+      "attendance": 1,
       "badge": "Bronze 🥉",
-      "punchIn": 1772655106587,
-      "proofs": []
+      "history": [
+        {
+          "type": "Attendance",
+          "date": "2026-03-14T22:54:42.169Z",
+          "comment": "Worked session"
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-14T23:18:06.304Z",
+          "comment": "nice work"
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-14T23:18:32.185Z",
+          "comment": ""
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-14T23:33:12.132Z"
+        }
+      ],
+      "punchIn": null
+    },
+    {
+      "id": 1773529011509,
+      "email": "adi@ecoimpact.org",
+      "password": "admin123",
+      "role": "volunteer",
+      "points": 110,
+      "attendance": 1,
+      "badge": "Bronze 🥉",
+      "history": [
+        {
+          "type": "Attendance",
+          "date": "2026-03-14T22:57:02.053Z",
+          "comment": "Worked session"
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-14T23:18:19.190Z",
+          "comment": ""
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-14T23:33:15.445Z"
+        }
+      ],
+      "punchIn": null
+    },
+    {
+      "id": 1773533780315,
+      "email": "rohit@gmail.com",
+      "password": "rohit",
+      "role": "volunteer",
+      "points": 10,
+      "attendance": 1,
+      "badge": "Bronze 🥉",
+      "history": [
+        {
+          "type": "Attendance",
+          "date": "2026-03-15T00:16:33.884Z",
+          "comment": "Worked session"
+        }
+      ],
+      "punchIn": null
+    },
+    {
+      "id": 1773591712204,
+      "email": "shat",
+      "password": "1234",
+      "role": "volunteer",
+      "points": 10,
+      "attendance": 1,
+      "badge": "Bronze 🥉",
+      "history": [
+        {
+          "type": "Attendance",
+          "date": "2026-03-15T16:23:06.096Z",
+          "comment": "Worked session"
+        }
+      ],
+      "punchIn": null
+    }
+  ],
+  "proofs": [
+    {
+      "id": 1773528873817,
+      "email": "tej123@gmail.com",
+      "filename": "1773528873797-Screenshot (3).png",
+      "status": "Approved"
+    },
+    {
+      "id": 1773529035200,
+      "email": "adi@ecoimpact.org",
+      "filename": "1773529035195-Screenshot (21).png",
+      "status": "Approved"
+    },
+    {
+      "id": 1773541327666,
+      "email": "rohit@gmail.com",
+      "filename": "1773541327589-Screenshot 2025-12-15 210424.png",
+      "status": "Pending"
+    },
+    {
+      "id": 1773591803076,
+      "email": "shat",
+      "filename": "1773591803056-Screenshot (19).png",
+      "status": "Pending"
     }
   ],
   "campaigns": [],
-  "attendance": [],
-  "proofs": [
-    {
-      "id": 1772304147039,
-      "email": "panchalprince2510@gmail.com",
-      "filename": "1772304147029-Screenshot 2025-12-15 210009.png",
-      "status": "Approved",
-      "comment": ""
-    },
-    {
-      "id": 1772304150258,
-      "email": "panchalprince2510@gmail.com",
-      "filename": "1772304150254-Screenshot 2025-12-15 210009.png",
-      "status": "Pending",
-      "comment": ""
-    }
-  ]
+  "gallery": []
 }

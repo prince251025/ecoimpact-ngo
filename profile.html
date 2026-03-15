@@ -108,7 +108,9 @@ background:#1b5e20;
 
 <div class="badge" id="badge"></div>
 
-<button onclick="downloadCertificate()">🎓 Download Certificate</button>
+<button onclick="downloadCertificate()">
+Download My Certificate
+</button>
 
 </div>
 
@@ -133,7 +135,45 @@ document.getElementById("badge").innerText=current.badge || "Bronze 🥉";
 }
 
 function downloadCertificate(){
-alert("Certificate Generated 🎉 (Demo Version)");
+
+const canvas = document.createElement("canvas")
+const ctx = canvas.getContext("2d")
+
+canvas.width = 1200
+canvas.height = 850
+
+const img = new Image()
+img.src = "assets/certificate.png"
+
+img.onload = function(){
+
+ctx.drawImage(img,0,0,1200,850)
+
+const user = JSON.parse(localStorage.getItem("user"))
+
+const name = user.email
+const points = document.getElementById("points").innerText
+const date = new Date().toLocaleDateString()
+
+ctx.font = "40px Arial"
+ctx.fillStyle = "black"
+ctx.textAlign = "center"
+
+ctx.fillText(name,600,420)
+
+ctx.font = "25px Arial"
+ctx.fillText("Impact Points: "+points,600,480)
+
+ctx.fillText("Date: "+date,600,530)
+
+const link = document.createElement("a")
+link.download = "certificate.png"
+link.href = canvas.toDataURL()
+
+link.click()
+
+}
+
 }
 
 loadProfile();

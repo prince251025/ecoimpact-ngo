@@ -1,178 +1,269 @@
-const express = require("express");
-const cors = require("cors");
-const multer = require("multer");
-const bcrypt = require("bcrypt");
-const { v4: uuidv4 } = require("uuid");
-const fs = require("fs");
+const express = require("express")
+const cors = require("cors")
+const fs = require("fs")
+const multer = require("multer")
+const PDFDocument = require("pdfkit")
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static(__dirname));
+const app = express()
 
-/* ---------------- DATABASE (File Based Professional System) ---------------- */
+app.use(cors())
+app.use(express.json())
+app.use(express.static(__dirname))
+app.use("/uploads", express.static("uploads"))
 
-const DB_FILE = "db.json";
+const DB = "db.json"
 
-function readDB() {
-  return JSON.parse(fs.readFileSync(DB_FILE));
+function readDB(){
+return JSON.parse(fs.readFileSync(DB))
 }
 
-function writeDB(data) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+function writeDB(data){
+fs.writeFileSync(DB, JSON.stringify(data,null,2))
 }
 
-/* ---------------- FILE UPLOAD ---------------- */
+//////////////// USERS //////////////////
+
+app.get("/users",(req,res)=>{
+const db=readDB()
+res.json(db.users)
+})
+
+//////////////// LOGIN //////////////////
+
+app.post("/login",(req,res)=>{
+
+const {email,password}=req.body
+const db=readDB()
+
+const user=db.users.find(
+u=>u.email===email && u.password===password
+)
+
+if(!user){
+return res.json({success:false})
+}
+
+res.json({success:true,user})
+
+})
+
+//////////////// REGISTER //////////////////
+
+app.post("/register",(req,res)=>{
+
+const {email,password}=req.body
+const db=readDB()
+
+db.users.push({
+id:Date.now(),
+email,
+password,
+role:"volunteer",
+points:0,
+attendance:0,
+badge:"Bronze 🥉",
+history:[]
+})
+
+writeDB(db)
+
+res.json({success:true})
+
+})
+
+//////////////// FILE UPLOAD //////////////////
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    if (!fs.existsSync("./uploads")) {
-      fs.mkdirSync("./uploads");
-    }
-    cb(null, "./uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
 
-const upload = multer({ storage });
+destination:"uploads/",
 
-app.use("/uploads", express.static("uploads"));
+filename:(req,file,cb)=>{
+cb(null,Date.now()+"-"+file.originalname)
+}
 
-/* ---------------- REGISTER ---------------- */
+})
 
-app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
-  const db = readDB();
+const upload = multer({storage})
 
-  const userExists = db.users.find((u) => u.email === email);
-  if (userExists) {
-    return res.json({ success: false, message: "User already exists" });
-  }
+app.post("/upload", upload.single("image"), (req,res)=>{
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+const db=readDB()
 
-  const newUser = {
-    id: uuidv4(),
-    email,
-    password: hashedPassword,
-    role: "volunteer",
-    points: 0,
-    attendance: 0,
-    totalHours: 0,
-    badge: "Bronze 🥉",
-    punchIn: null,
-    proofs: [],
-  };
+db.proofs.push({
 
-  db.users.push(newUser);
-  writeDB(db);
+id:Date.now(),
+email:req.body.email,
+filename:req.file.filename,
+status:"Pending"
 
-  res.json({ success: true, message: "Account created successfully" });
-});
+})
 
-/* ---------------- LOGIN ---------------- */
+writeDB(db)
 
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const db = readDB();
+res.json({success:true})
 
-  const user = db.users.find((u) => u.email === email);
-  if (!user) return res.json({ success: false, message: "User not found" });
+})
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.json({ success: false, message: "Wrong password" });
+//////////////// GET PROOFS //////////////////
 
-  res.json({
-    success: true,
-    user: {
-      email: user.email,
-      role: user.role,
-      points: user.points,
-      attendance: user.attendance,
-      badge: user.badge,
-    },
-  });
-});
+app.get("/proofs",(req,res)=>{
+const db=readDB()
+res.json(db.proofs)
+})
 
-/* ---------------- ATTENDANCE ---------------- */
+//////////////// APPROVE //////////////////
 
-app.post("/punch-in", (req, res) => {
-  const { email } = req.body;
-  const db = readDB();
-  const user = db.users.find((u) => u.email === email);
+app.post("/approve-proof",(req,res)=>{
 
-  if (!user) return res.json({ message: "User not found" });
+const {id}=req.body
+const db=readDB()
 
-  user.punchIn = Date.now();
-  writeDB(db);
+const proof=db.proofs.find(p=>p.id==id)
 
-  res.json({ message: "Punch In recorded" });
-});
+if(proof){
 
-app.post("/punch-out", (req, res) => {
-  const { email } = req.body;
-  const db = readDB();
-  const user = db.users.find((u) => u.email === email);
+proof.status="Approved"
 
-  if (!user || !user.punchIn)
-    return res.json({ message: "Punch In first" });
+const user=db.users.find(u=>u.email===proof.email)
 
-  const hoursWorked =
-    (Date.now() - user.punchIn) / (1000 * 60 * 60);
+if(user){
+user.points+=50
+user.history.push({
+type:"Proof Approved",
+date:new Date()
+})
+}
 
-  user.attendance += 1;
-  user.totalHours += hoursWorked;
-  user.points += Math.floor(hoursWorked * 10);
+}
 
-  user.punchIn = null;
+writeDB(db)
 
-  if (user.points > 200) user.badge = "Gold 🥇";
-  else if (user.points > 100) user.badge = "Silver 🥈";
+res.json({success:true})
 
-  writeDB(db);
+})
 
-  res.json({ message: "Punch Out recorded" });
-});
+//////////////// REJECT //////////////////
 
-/* ---------------- PHOTO PROOF ---------------- */
+app.post("/reject-proof",(req,res)=>{
 
-app.post("/upload", upload.single("image"), (req, res) => {
-  const { email } = req.body;
-  const db = readDB();
-  const user = db.users.find((u) => u.email === email);
+const {id}=req.body
+const db=readDB()
 
-  if (!user) return res.json({ message: "User not found" });
+const proof=db.proofs.find(p=>p.id==id)
 
-  const proof = {
-    id: uuidv4(),
-    filename: req.file.filename,
-    date: new Date(),
-    status: "Pending",
-  };
+if(proof){
+proof.status="Rejected"
+}
 
-  user.proofs.push(proof);
-  writeDB(db);
+writeDB(db)
 
-  res.json({ message: "Proof uploaded successfully" });
-});
+res.json({success:true})
 
-/* ---------------- ADMIN VIEW ---------------- */
+})
 
-app.get("/users", (req, res) => {
-  const db = readDB();
-  res.json(db.users);
-});
+//////////////// CAMPAIGNS //////////////////
 
-/* ---------------- START SERVER ---------------- */
+app.get("/campaigns",(req,res)=>{
+const db=readDB()
+res.json(db.campaigns || [])
+})
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/login.html");
-});
+app.post("/add-campaign",(req,res)=>{
 
-const PORT = process.env.PORT || 5000;
+const db=readDB()
 
-app.listen(PORT, () => {
-  console.log("Server Running on port " + PORT);
-});
+if(!db.campaigns) db.campaigns=[]
+
+db.campaigns.push({
+id:Date.now(),
+title:req.body.title,
+description:req.body.description,
+image:req.body.image
+})
+
+writeDB(db)
+
+res.json({success:true})
+
+})
+
+//////////////// GALLERY //////////////////
+
+app.get("/gallery",(req,res)=>{
+const db=readDB()
+res.json(db.gallery || [])
+})
+
+app.post("/add-gallery",(req,res)=>{
+
+const db=readDB()
+
+if(!db.gallery) db.gallery=[]
+
+db.gallery.push({
+id:Date.now(),
+image:req.body.image
+})
+
+writeDB(db)
+
+res.json({success:true})
+
+})
+
+//////////////// CERTIFICATE //////////////////
+
+app.get("/certificate/:email",(req,res)=>{
+
+const email = req.params.email
+const db = readDB()
+
+const user = db.users.find(u=>u.email === email)
+
+if(!user){
+return res.send("User not found")
+}
+
+const doc = new PDFDocument({
+layout:"landscape",
+size:"A4"
+})
+
+res.setHeader(
+"Content-Disposition",
+"attachment; filename=certificate.pdf"
+)
+
+res.setHeader("Content-Type","application/pdf")
+
+doc.pipe(res)
+
+doc.image("assets/certificate.png",0,0,{
+width:842
+})
+
+doc.fontSize(40)
+.text(user.email,0,350,{align:"center"})
+
+doc.fontSize(20)
+.text("Impact Points: "+user.points,0,420,{align:"center"})
+
+doc.text(
+"Date: "+new Date().toLocaleDateString(),
+0,
+470,
+{align:"center"}
+)
+
+doc.end()
+
+})
+
+//////////////// START //////////////////
+app.get("/", (req,res)=>{
+res.sendFile(__dirname + "/login.html")
+})
+
+app.listen(5000,()=>{
+console.log("Server running on http://localhost:5000")
+})

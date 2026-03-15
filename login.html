@@ -12,23 +12,15 @@
 
 <h2>EcoImpact NGO 🌱</h2>
 
-<input type="text" id="name" placeholder="Full Name (For Register)" style="display:none;">
-<input type="email" id="email" placeholder="Enter Email" required>
-<input type="password" id="password" placeholder="Enter Password" required>
+<input type="text" id="name" placeholder="Full Name (for register)">
+<input type="email" id="email" placeholder="Enter Email">
+<input type="password" id="password" placeholder="Enter Password">
 
 <button onclick="login()">Login</button>
 
-<p style="text-align:center;margin-top:15px;">
-  Don’t have an account?
-  <a href="#" onclick="registerUser()">Create Account</a>
-</p>
-<button onclick="register()" id="registerBtn" style="margin-top:10px; background:#66bb6a;">
+<button onclick="register()" style="background:#66bb6a;margin-top:10px;">
 Create Account
 </button>
-
-<p style="margin-top:15px; font-size:14px;">
-Don't have an account? Click Create Account
-</p>
 
 </div>
 
@@ -37,86 +29,72 @@ Don't have an account? Click Create Account
 // LOGIN
 async function login(){
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
 
-  try {
-    const res = await fetch("http://localhost:5000/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({email,password})
-    });
-
-    const data = await res.json();
-
-    console.log(data); // 🔥 ADD THIS FOR DEBUG
-
-    if(data.success){
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      if(data.user.role === "admin"){
-        window.location.href="admin.html";
-      }else{
-        window.location.href="dashboard.html";
-      }
-
-    }else{
-      alert(data.message);
-    }
-
-  } catch(err){
-    alert("Server not reachable ❌");
-    console.log(err);
-  }
+if(!email || !password){
+alert("Please enter email and password");
+return;
 }
 
-async function registerUser(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+try{
 
-  if(!email || !password){
-    alert("Please enter email and password");
-    return;
-  }
+const res = await fetch("http://localhost:5000/login",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email,password})
+});
 
-  const res = await fetch("/register",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,password})
-  });
+const data = await res.json();
 
-  const data = await res.json();
-  alert(data.message);
+if(data.success){
+
+localStorage.setItem("user", JSON.stringify(data.user));
+
+if(data.user.role === "admin"){
+window.location.href="admin.html";
+}else{
+window.location.href="dashboard.html";
+}
+
+}else{
+alert(data.message || "Invalid login");
+}
+
+}catch(err){
+alert("Server not reachable ❌");
+console.log(err);
+}
+
 }
 
 // REGISTER
 async function register(){
 
-  const name = document.getElementById("name");
-  name.style.display="block";
+const name = document.getElementById("name").value.trim();
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value.trim();
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+if(!name || !email || !password){
+alert("Please fill all fields");
+return;
+}
 
-  if(!email || !password){
-    alert("Please enter email & password first");
-    return;
-  }
+const res = await fetch("http://localhost:5000/register",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name,
+email,
+password,
+role:"volunteer"
+})
+});
 
-  const res = await fetch("http://localhost:5000/register",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      email,
-      password,
-      role:"volunteer",
-      name:name.value || "Volunteer"
-    })
-  });
+const data = await res.json();
 
-  const data = await res.json();
+alert(data.message);
 
-  alert(data.message);
 }
 
 </script>
