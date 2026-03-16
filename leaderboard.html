@@ -1,32 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Leaderboard</title>
+<title>EcoImpact Leaderboard</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+background:#e8f5e9;
+margin:0;
+padding:0;
+}
+
+h2{
+text-align:center;
+margin-top:40px;
+color:#1b5e20;
+}
+
+#board{
+max-width:600px;
+margin:auto;
+padding:0;
+list-style:none;
+}
+
+#board li{
+background:white;
+padding:15px;
+margin:10px 0;
+border-radius:8px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
+display:flex;
+justify-content:space-between;
+font-weight:bold;
+}
+
+.rank{
+color:#2e7d32;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<h2 style="text-align:center;margin-top:40px;">Top Volunteers 🏆</h2>
+<h2>Top Volunteers 🏆</h2>
 
-<ul id="board" style="max-width:600px;margin:auto;"></ul>
+<ul id="board"></ul>
 
 <script>
+
 async function loadBoard(){
-const res = await fetch("http://localhost:5000/users");
+
+try{
+
+const res = await fetch("/users");   // ✅ FIXED
+
 const users = await res.json();
 
-users.sort((a,b)=>b.points-a.points);
+users.sort((a,b)=>(b.points||0)-(a.points||0));
 
 let list=document.getElementById("board");
+
 list.innerHTML="";
 
 users.forEach((u,i)=>{
-list.innerHTML+=`<li style="padding:10px;">${i+1}. ${u.email} - ${u.points} pts</li>`;
+
+list.innerHTML+=`
+
+<li>
+
+<span class="rank">#${i+1} ${u.email}</span>
+
+<span>${u.points || 0} pts</span>
+
+</li>
+
+`;
+
 });
+
+}
+
+catch(err){
+
+document.getElementById("board").innerHTML =
+"<li>⚠ Unable to load leaderboard</li>";
+
+console.log(err);
+
+}
+
 }
 
 loadBoard();
+
 </script>
 
 </body>

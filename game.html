@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 body{
 margin:0;
 font-family:'Poppins',sans-serif;
@@ -67,12 +68,14 @@ opacity:0.8;
 display:none;
 margin-top:20px;
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="header">
+
 <h1>🌍 Tree Rescue Mission</h1>
 
 <div class="stats">
@@ -96,11 +99,18 @@ margin-top:20px;
 
 <script>
 
+// ================= USER SESSION =================
+
 const user = JSON.parse(localStorage.getItem("user"));
+
 if(!user){
 window.location.href="login.html";
 }
+
 const email = user.email;
+
+
+// ================= GAME VARIABLES =================
 
 let score=0;
 let time=30;
@@ -108,20 +118,32 @@ let combo=0;
 let gameInterval;
 let spawnInterval;
 
+
+// ================= START GAME =================
+
 function startGame(){
+
 score=0;
 time=30;
 combo=0;
+
 document.getElementById("score").innerText=0;
 document.getElementById("time").innerText=30;
 document.getElementById("combo").innerText=0;
 document.getElementById("gameOver").style.display="none";
 
+document.getElementById("gameArea").innerHTML="";
+
 spawnInterval=setInterval(spawnTree,800);
 gameInterval=setInterval(updateTimer,1000);
+
 }
 
+
+// ================= SPAWN TREE =================
+
 function spawnTree(){
+
 const tree=document.createElement("div");
 tree.classList.add("tree");
 tree.innerText="🌳";
@@ -130,48 +152,84 @@ tree.style.left=Math.random()*90+"%";
 tree.style.top=Math.random()*80+"%";
 
 tree.onclick=function(){
+
 score+=1+(combo);
 combo++;
+
 document.getElementById("score").innerText=score;
 document.getElementById("combo").innerText=combo;
+
 tree.remove();
+
 };
 
 document.getElementById("gameArea").appendChild(tree);
 
 setTimeout(()=>{
+
 if(tree.parentNode){
+
 tree.remove();
 combo=0;
+
 document.getElementById("combo").innerText=0;
-}
-},1500);
+
 }
 
+},1500);
+
+}
+
+
+// ================= TIMER =================
+
 function updateTimer(){
+
 time--;
+
 document.getElementById("time").innerText=time;
 
 if(time<=0){
+
 clearInterval(gameInterval);
 clearInterval(spawnInterval);
+
 endGame();
-}
+
 }
 
+}
+
+
+// ================= END GAME =================
+
 function endGame(){
+
 document.getElementById("gameOver").style.display="block";
 document.getElementById("finalScore").innerText=score;
 
-fetch("http://localhost:5000/add-points",{
+// SAVE POINTS TO SERVER
+
+fetch("/add-points",{
+
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({email,points:score})
+body:JSON.stringify({
+email:email,
+points:score
+})
+
 });
+
 }
 
+
+// ================= BACK TO DASHBOARD =================
+
 function goBack(){
+
 window.location.href="dashboard.html";
+
 }
 
 </script>

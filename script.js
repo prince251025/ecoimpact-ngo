@@ -3,7 +3,11 @@
 // Professional Controller Layer
 // ===============================
 
-// Get Logged User
+
+// ===============================
+// 👤 Get Logged User
+// ===============================
+
 const userData = JSON.parse(localStorage.getItem("user"));
 
 if (!userData) {
@@ -12,12 +16,17 @@ if (!userData) {
 
 const email = userData.email;
 
+
 // ===============================
 // 🎯 Load Dashboard Data
 // ===============================
+
 async function loadDashboard() {
+
   try {
-    const res = await fetch("http://localhost:5000/users");
+
+    const res = await fetch("/users");   // ✅ FIXED
+
     const users = await res.json();
 
     const user = users.find(u => u.email === email);
@@ -29,145 +38,239 @@ async function loadDashboard() {
     updateBadge(user);
 
   } catch (error) {
+
     console.error("Dashboard Load Error:", error);
+    showNotification("Failed to load dashboard ❌");
+
   }
+
 }
+
 
 // ===============================
 // 📊 Update Stats
 // ===============================
+
 function updateStats(user) {
-  animateCounter("points", user.points);
-  document.getElementById("attendance").innerText = user.attendance || 0;
+
+  animateCounter("points", user.points || 0);
+
+  document.getElementById("attendance").innerText =
+    user.attendance || 0;
+
 }
+
 
 // ===============================
 // 🏆 Badge Logic
 // ===============================
+
 function updateBadge(user) {
+
   let badge = "Bronze 🥉";
 
   if (user.points >= 100) badge = "Gold 🌟";
   else if (user.points >= 50) badge = "Silver 🥈";
 
   document.getElementById("badge").innerText = badge;
+
 }
 
+
 // ===============================
-// 📈 Progress Bar Animation
+// 📈 Progress Bar
 // ===============================
+
 function updateProgress(user) {
+
   let percent = (user.points / 100) * 100;
+
   if (percent > 100) percent = 100;
 
   const progressBar = document.getElementById("progressBar");
   const progressText = document.getElementById("progressText");
 
   progressBar.style.width = percent + "%";
-  progressText.innerText = Math.floor(percent) + "% to Gold Level";
+
+  progressText.innerText =
+    Math.floor(percent) + "% to Gold Level";
+
 }
+
 
 // ===============================
 // 🔢 Animated Counter
 // ===============================
+
 function animateCounter(id, target) {
+
   let count = 0;
+
   const element = document.getElementById(id);
 
   const increment = Math.ceil(target / 50);
 
   const interval = setInterval(() => {
+
     count += increment;
+
     if (count >= target) {
       count = target;
       clearInterval(interval);
     }
+
     element.innerText = count;
+
   }, 20);
+
 }
+
 
 // ===============================
 // 🌙 Theme Toggle
 // ===============================
+
 function toggleTheme() {
+
   document.body.classList.toggle("dark-mode");
-  localStorage.setItem("theme", document.body.classList.contains("dark-mode"));
+
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("dark-mode")
+  );
+
 }
+
 
 // Load saved theme
+
 if (localStorage.getItem("theme") === "true") {
+
   document.body.classList.add("dark-mode");
+
 }
 
+
 // ===============================
-// ⏱ Attendance System (Professional)
+// ⏱ Attendance System
 // ===============================
+
 async function punchIn() {
+
   try {
-    const res = await fetch("http://localhost:5000/punch-in", {
+
+    const res = await fetch("/punch-in", {   // ✅ FIXED
+
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
       body: JSON.stringify({ email })
+
     });
 
     const data = await res.json();
+
     showNotification(data.message);
 
   } catch (err) {
+
     showNotification("Server Error ❌");
+
   }
+
 }
 
+
 async function punchOut() {
+
   try {
-    const res = await fetch("http://localhost:5000/punch-out", {
+
+    const res = await fetch("/punch-out", {   // ✅ FIXED
+
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
       body: JSON.stringify({ email })
+
     });
 
     const data = await res.json();
+
     showNotification(data.message);
 
     loadDashboard();
 
   } catch (err) {
+
     showNotification("Server Error ❌");
+
   }
+
 }
+
 
 // ===============================
 // 📍 GPS Verification
 // ===============================
+
 function verifyLocation() {
+
   if (!navigator.geolocation) {
+
     return showNotification("Geolocation not supported ❌");
+
   }
 
-  navigator.geolocation.getCurrentPosition(async position => {
+  navigator.geolocation.getCurrentPosition(
 
-    const lat = position.coords.latitude;
-    const long = position.coords.longitude;
+    async position => {
 
-    const res = await fetch("http://localhost:5000/gps-check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, lat, long })
-    });
+      const lat = position.coords.latitude;
+      const long = position.coords.longitude;
 
-    const data = await res.json();
-    showNotification(data.message);
+      const res = await fetch("/gps-check", {   // ✅ FIXED
 
-  }, () => {
-    showNotification("Location permission denied ❌");
-  });
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({ email, lat, long })
+
+      });
+
+      const data = await res.json();
+
+      showNotification(data.message);
+
+    },
+
+    () => {
+
+      showNotification("Location permission denied ❌");
+
+    }
+
+  );
+
 }
 
+
 // ===============================
-// 🔔 Professional Notification System
+// 🔔 Notification System
 // ===============================
+
 function showNotification(message) {
+
   const notif = document.createElement("div");
+
   notif.innerText = message;
 
   notif.style.position = "fixed";
@@ -185,12 +288,17 @@ function showNotification(message) {
   setTimeout(() => {
     notif.remove();
   }, 3000);
+
 }
+
 
 // ===============================
 // 🔄 Auto Refresh Dashboard
 // ===============================
+
 setInterval(loadDashboard, 10000);
 
+
 // Initial Load
+
 loadDashboard();

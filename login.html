@@ -2,8 +2,62 @@
 <html>
 <head>
 <title>EcoImpact Login</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(to right,#2e7d32,#66bb6a);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.login-card{
+background:white;
+padding:40px;
+border-radius:10px;
+width:320px;
+text-align:center;
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+.login-card h2{
+margin-bottom:20px;
+color:#2e7d32;
+}
+
+.login-card input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+.login-card button{
+width:100%;
+padding:10px;
+border:none;
+background:#2e7d32;
+color:white;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.login-card button:hover{
+opacity:0.9;
+}
+
+</style>
+
 </head>
 
 <body class="login-section">
@@ -26,7 +80,8 @@ Create Account
 
 <script>
 
-// LOGIN
+// ================= LOGIN =================
+
 async function login(){
 
 const email = document.getElementById("email").value.trim();
@@ -39,10 +94,16 @@ return;
 
 try{
 
-const res = await fetch("http://localhost:5000/login",{
+const res = await fetch("/login",{   // ✅ FIXED
+
 method:"POST",
-headers:{"Content-Type":"application/json"},
+
+headers:{
+"Content-Type":"application/json"
+},
+
 body:JSON.stringify({email,password})
+
 });
 
 const data = await res.json();
@@ -62,13 +123,17 @@ alert(data.message || "Invalid login");
 }
 
 }catch(err){
+
 alert("Server not reachable ❌");
 console.log(err);
-}
 
 }
 
-// REGISTER
+}
+
+
+// ================= REGISTER =================
+
 async function register(){
 
 const name = document.getElementById("name").value.trim();
@@ -80,20 +145,35 @@ alert("Please fill all fields");
 return;
 }
 
-const res = await fetch("http://localhost:5000/register",{
+try{
+
+const res = await fetch("/register",{   // ✅ FIXED
+
 method:"POST",
-headers:{"Content-Type":"application/json"},
+
+headers:{
+"Content-Type":"application/json"
+},
+
 body:JSON.stringify({
 name,
 email,
 password,
 role:"volunteer"
 })
+
 });
 
 const data = await res.json();
 
 alert(data.message);
+
+}catch(err){
+
+alert("Registration failed ❌");
+console.log(err);
+
+}
 
 }
 

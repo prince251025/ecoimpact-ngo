@@ -71,7 +71,7 @@
       "email": "rohit@gmail.com",
       "password": "rohit",
       "role": "volunteer",
-      "points": 10,
+      "points": 60,
       "attendance": 1,
       "badge": "Bronze 🥉",
       "history": [
@@ -79,6 +79,10 @@
           "type": "Attendance",
           "date": "2026-03-15T00:16:33.884Z",
           "comment": "Worked session"
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-15T23:38:01.721Z"
         }
       ],
       "punchIn": null
@@ -88,7 +92,7 @@
       "email": "shat",
       "password": "1234",
       "role": "volunteer",
-      "points": 10,
+      "points": 60,
       "attendance": 1,
       "badge": "Bronze 🥉",
       "history": [
@@ -96,9 +100,34 @@
           "type": "Attendance",
           "date": "2026-03-15T16:23:06.096Z",
           "comment": "Worked session"
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-15T23:38:00.167Z"
         }
       ],
       "punchIn": null
+    },
+    {
+      "id": 1773617562610,
+      "email": "panchalprince",
+      "password": "12345",
+      "role": "volunteer",
+      "points": 60,
+      "attendance": 1,
+      "badge": "Bronze 🥉",
+      "history": [
+        {
+          "type": "Attendance",
+          "date": "2026-03-15T23:33:05.326Z",
+          "comment": "Worked session"
+        },
+        {
+          "type": "Proof Approved",
+          "date": "2026-03-15T23:37:56.277Z"
+        }
+      ],
+      "punchIn": 1773617591907
     }
   ],
   "proofs": [
@@ -118,13 +147,31 @@
       "id": 1773541327666,
       "email": "rohit@gmail.com",
       "filename": "1773541327589-Screenshot 2025-12-15 210424.png",
-      "status": "Pending"
+      "status": "Approved"
     },
     {
       "id": 1773591803076,
       "email": "shat",
       "filename": "1773591803056-Screenshot (19).png",
-      "status": "Pending"
+      "status": "Approved"
+    },
+    {
+      "id": 1773617609727,
+      "email": "panchalprince",
+      "filename": "1773617609689-Screenshot (1).png",
+      "status": "Rejected"
+    },
+    {
+      "id": 1773617617057,
+      "email": "panchalprince",
+      "filename": "1773617617049-Screenshot (1).png",
+      "status": "Rejected"
+    },
+    {
+      "id": 1773617631195,
+      "email": "panchalprince",
+      "filename": "1773617631182-Screenshot (1).png",
+      "status": "Approved"
     }
   ],
   "campaigns": [],

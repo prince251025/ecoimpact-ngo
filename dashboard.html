@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 :root{
 --primary:#2e7d32;
 --secondary:#66bb6a;
@@ -53,11 +54,6 @@ display:block;
 color:white;
 text-decoration:none;
 margin:15px 0;
-transition:0.3s;
-}
-
-.sidebar a:hover{
-padding-left:8px;
 }
 
 .sidebar button{
@@ -74,7 +70,6 @@ width:100%;
 .header{
 display:flex;
 justify-content:space-between;
-align-items:center;
 margin-bottom:30px;
 }
 
@@ -84,7 +79,6 @@ padding:25px;
 border-radius:15px;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
 margin-bottom:25px;
-transition:0.3s;
 }
 
 .dark .card{
@@ -103,11 +97,6 @@ min-width:200px;
 text-align:center;
 }
 
-.stat-box h3{
-color:var(--primary);
-margin-bottom:10px;
-}
-
 button{
 padding:10px 15px;
 border:none;
@@ -115,11 +104,6 @@ background:var(--primary);
 color:white;
 border-radius:6px;
 cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{
-opacity:0.85;
 }
 
 input[type="file"]{
@@ -158,18 +142,23 @@ height:auto;
 margin-left:0;
 }
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="sidebar">
+
 <h2>🌍 EcoImpact</h2>
+
 <a href="index.html">🏠 Home</a>
 <a href="game.html">🎮 Eco Game</a>
 <a href="admin.html">📊 Admin</a>
+
 <button onclick="toggleTheme()">🌙 Toggle Theme</button>
 <button onclick="logout()">🚪 Logout</button>
+
 </div>
 
 <div class="main">
@@ -199,28 +188,44 @@ margin-left:0;
 </div>
 
 <div class="card">
+
 <h3>⏱ Attendance System</h3>
+
 <button onclick="punchIn()">Punch In</button>
 <button onclick="punchOut()">Punch Out</button>
+
 <p class="status" id="attendanceStatus"></p>
+
 </div>
 
 <div class="card">
+
 <h3>📸 Upload Environmental Activity Proof</h3>
+
 <form id="uploadForm" enctype="multipart/form-data">
+
 <input type="file" name="image" required>
+
 <br>
+
 <button type="submit">Upload Proof</button>
+
 </form>
+
 </div>
 
 <div class="card">
+
 <h3>🌟 Progress to Gold Badge</h3>
+
 <div class="progress-container">
 <div class="progress-bar" id="progressBar"></div>
 </div>
+
 <p id="progressText">0%</p>
+
 </div>
+
 <h2>My Activity Submissions</h2>
 
 <div id="myProofs"></div>
@@ -234,148 +239,141 @@ margin-left:0;
 const user = JSON.parse(localStorage.getItem("user"));
 
 if(!user){
-    window.location.href="login.html";
+window.location.href="login.html";
 }
 
 const email = user.email;
-document.getElementById("welcomeUser").innerText = "Welcome, " + email;
+document.getElementById("welcomeUser").innerText="Welcome, "+email;
 
 
 // ================= THEME =================
 
 function toggleTheme(){
-    document.body.classList.toggle("dark");
+document.body.classList.toggle("dark");
 }
 
 
 // ================= LOGOUT =================
 
 function logout(){
-    localStorage.removeItem("user");
-    window.location.href="login.html";
+localStorage.removeItem("user");
+window.location.href="login.html";
 }
 
 
-// ================= LOAD USER DATA =================
+// ================= LOAD USER =================
 
 async function loadUser(){
-    try{
-        const res = await fetch("http://localhost:5000/users");
-        const users = await res.json();
 
-        const current = users.find(u=>u.email===email);
-        if(!current) return;
+const res = await fetch("/users");
 
-        document.getElementById("points").innerText = current.points || 0;
-        document.getElementById("attendance").innerText = current.attendance || 0;
-        document.getElementById("badge").innerText = current.badge || "Bronze 🥉";
+const users = await res.json();
 
-        updateProgress(current.points || 0);
-    }
-    catch(err){
-        console.log("Server not reachable");
-    }
+const current = users.find(u=>u.email===email);
+
+if(!current) return;
+
+document.getElementById("points").innerText=current.points || 0;
+document.getElementById("attendance").innerText=current.attendance || 0;
+document.getElementById("badge").innerText=current.badge || "Bronze 🥉";
+
+updateProgress(current.points || 0);
+
 }
 
 
 // ================= PROGRESS =================
 
 function updateProgress(points){
-    let percent = Math.min(points,100);
-    document.getElementById("progressBar").style.width = percent + "%";
-    document.getElementById("progressText").innerText = percent + "% to Gold Badge";
+
+let percent=Math.min(points,100);
+
+document.getElementById("progressBar").style.width=percent+"%";
+
+document.getElementById("progressText").innerText=percent+"% to Gold Badge";
+
 }
-  
 
-// ================= ATTENDANCE TIMER =================
 
-let timerInterval;
-let startTime;
+// ================= ATTENDANCE =================
 
 async function punchIn(){
 
-    startTime = new Date();
-    localStorage.setItem("punchStart", startTime);
+await fetch("/punch-in",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email})
+});
 
-    await fetch("http://localhost:5000/punch-out",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email})
-    });
+document.getElementById("attendanceStatus").innerText="🟢 Working...";
 
-    document.getElementById("attendanceStatus").innerText="🟢 Working...";
-
-    timerInterval = setInterval(()=>{
-        const now = new Date();
-        const diff = Math.floor((now - new Date(localStorage.getItem("punchStart"))) / 1000);
-        document.getElementById("attendanceStatus").innerText = 
-        "🟢 Working... " + diff + " sec";
-    },1000);
 }
 
 
 async function punchOut(){
 
-    clearInterval(timerInterval);
+await fetch("/punch-out",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email})
+});
 
-    await fetch("http://localhost:5000/punch-in",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email})
-    });
+document.getElementById("attendanceStatus").innerText="✅ Attendance Completed";
 
-    document.getElementById("attendanceStatus").innerText="✅ Attendance Completed";
+loadUser();
 
-    localStorage.removeItem("punchStart");
-
-    loadUser();
 }
 
 
 // ================= IMAGE UPLOAD =================
 
-document.getElementById("uploadForm").onsubmit = async function(e){
+document.getElementById("uploadForm").onsubmit=async function(e){
 
-    e.preventDefault();
+e.preventDefault();
 
-    let formData = new FormData(this);
-    formData.append("email", email);
+let formData=new FormData(this);
 
-    const res = await fetch("http://localhost:5000/upload",{
-        method:"POST",
-        body:formData
-    });
+formData.append("email",email);
 
-    const data = await res.json();
+const res=await fetch("/upload",{
+method:"POST",
+body:formData
+});
 
-    document.getElementById("attendanceStatus").innerText = data.message;
+const data=await res.json();
 
-    loadUser();
+document.getElementById("attendanceStatus").innerText=data.message;
+
+loadUser();
+loadMyProofs();
+
 };
+
+
+// ================= LOAD MY PROOFS =================
 
 async function loadMyProofs(){
 
-const user = JSON.parse(localStorage.getItem("user"));
+const res=await fetch("/proofs");
 
-const res = await fetch("http://localhost:5000/proofs");
+const proofs=await res.json();
 
-const proofs = await res.json();
-
-let html = "";
+let html="";
 
 proofs.forEach(p=>{
 
-if(p.email === user.email){
+if(p.email===email){
 
-let color = "orange";
+let color="orange";
 
-if(p.status === "Approved") color = "green";
-if(p.status === "Rejected") color = "red";
+if(p.status==="Approved") color="green";
+if(p.status==="Rejected") color="red";
 
-html += `
+html+=`
+
 <div style="border:1px solid #ddd;padding:10px;margin:10px">
 
-<img src="http://localhost:5000/uploads/${p.filename}" width="200">
+<img src="/uploads/${p.filename}" width="200">
 
 <p>Status:
 <span style="color:${color}">
@@ -384,22 +382,22 @@ ${p.status}
 </p>
 
 </div>
+
 `;
 
 }
 
 });
 
-document.getElementById("myProofs").innerHTML = html;
+document.getElementById("myProofs").innerHTML=html;
 
 }
-
-loadMyProofs();
 
 
 // ================= AUTO LOAD =================
 
 loadUser();
+loadMyProofs();
 
 </script>
 

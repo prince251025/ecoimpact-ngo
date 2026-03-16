@@ -3,32 +3,65 @@ const cors = require("cors")
 const fs = require("fs")
 const multer = require("multer")
 const PDFDocument = require("pdfkit")
+const path = require("path")
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+// Serve frontend files
 app.use(express.static(__dirname))
 app.use("/uploads", express.static("uploads"))
 
 const DB = "db.json"
 
+// Ensure DB exists
+if(!fs.existsSync(DB)){
+fs.writeFileSync(DB, JSON.stringify({
+users:[],
+proofs:[],
+campaigns:[],
+gallery:[]
+},null,2))
+}
+
+// Ensure uploads folder exists
+if(!fs.existsSync("uploads")){
+fs.mkdirSync("uploads")
+}
+
+
+// ==============================
+// DATABASE FUNCTIONS
+// ==============================
+
 function readDB(){
+try{
 return JSON.parse(fs.readFileSync(DB))
+}catch{
+return {users:[],proofs:[],campaigns:[],gallery:[]}
+}
 }
 
 function writeDB(data){
 fs.writeFileSync(DB, JSON.stringify(data,null,2))
 }
 
-//////////////// USERS //////////////////
+
+// ==============================
+// USERS
+// ==============================
 
 app.get("/users",(req,res)=>{
 const db=readDB()
 res.json(db.users)
 })
 
-//////////////// LOGIN //////////////////
+
+// ==============================
+// LOGIN
+// ==============================
 
 app.post("/login",(req,res)=>{
 
@@ -40,21 +73,40 @@ u=>u.email===email && u.password===password
 )
 
 if(!user){
-return res.json({success:false})
+return res.json({
+success:false,
+message:"Invalid credentials"
+})
 }
 
-res.json({success:true,user})
+res.json({
+success:true,
+user
+})
 
 })
 
-//////////////// REGISTER //////////////////
+
+// ==============================
+// REGISTER
+// ==============================
 
 app.post("/register",(req,res)=>{
 
 const {email,password}=req.body
 const db=readDB()
 
+const existing=db.users.find(u=>u.email===email)
+
+if(existing){
+return res.json({
+success:false,
+message:"User already exists"
+})
+}
+
 db.users.push({
+
 id:Date.now(),
 email,
 password,
@@ -63,15 +115,22 @@ points:0,
 attendance:0,
 badge:"Bronze 🥉",
 history:[]
+
 })
 
 writeDB(db)
 
-res.json({success:true})
+res.json({
+success:true,
+message:"Account created successfully"
+})
 
 })
 
-//////////////// FILE UPLOAD //////////////////
+
+// ==============================
+// FILE UPLOAD
+// ==============================
 
 const storage = multer.diskStorage({
 
@@ -84,6 +143,7 @@ cb(null,Date.now()+"-"+file.originalname)
 })
 
 const upload = multer({storage})
+
 
 app.post("/upload", upload.single("image"), (req,res)=>{
 
@@ -104,14 +164,20 @@ res.json({success:true})
 
 })
 
-//////////////// GET PROOFS //////////////////
+
+// ==============================
+// GET PROOFS
+// ==============================
 
 app.get("/proofs",(req,res)=>{
 const db=readDB()
 res.json(db.proofs)
 })
 
-//////////////// APPROVE //////////////////
+
+// ==============================
+// APPROVE PROOF
+// ==============================
 
 app.post("/approve-proof",(req,res)=>{
 
@@ -127,11 +193,14 @@ proof.status="Approved"
 const user=db.users.find(u=>u.email===proof.email)
 
 if(user){
+
 user.points+=50
+
 user.history.push({
 type:"Proof Approved",
 date:new Date()
 })
+
 }
 
 }
@@ -142,7 +211,10 @@ res.json({success:true})
 
 })
 
-//////////////// REJECT //////////////////
+
+// ==============================
+// REJECT PROOF
+// ==============================
 
 app.post("/reject-proof",(req,res)=>{
 
@@ -161,7 +233,10 @@ res.json({success:true})
 
 })
 
-//////////////// CAMPAIGNS //////////////////
+
+// ==============================
+// CAMPAIGNS
+// ==============================
 
 app.get("/campaigns",(req,res)=>{
 const db=readDB()
@@ -172,13 +247,13 @@ app.post("/add-campaign",(req,res)=>{
 
 const db=readDB()
 
-if(!db.campaigns) db.campaigns=[]
-
 db.campaigns.push({
+
 id:Date.now(),
 title:req.body.title,
 description:req.body.description,
 image:req.body.image
+
 })
 
 writeDB(db)
@@ -187,7 +262,10 @@ res.json({success:true})
 
 })
 
-//////////////// GALLERY //////////////////
+
+// ==============================
+// GALLERY
+// ==============================
 
 app.get("/gallery",(req,res)=>{
 const db=readDB()
@@ -198,11 +276,11 @@ app.post("/add-gallery",(req,res)=>{
 
 const db=readDB()
 
-if(!db.gallery) db.gallery=[]
-
 db.gallery.push({
+
 id:Date.now(),
 image:req.body.image
+
 })
 
 writeDB(db)
@@ -211,20 +289,23 @@ res.json({success:true})
 
 })
 
-//////////////// CERTIFICATE //////////////////
+
+// ==============================
+// CERTIFICATE GENERATOR
+// ==============================
 
 app.get("/certificate/:email",(req,res)=>{
 
-const email = req.params.email
-const db = readDB()
+const email=req.params.email
+const db=readDB()
 
-const user = db.users.find(u=>u.email === email)
+const user=db.users.find(u=>u.email===email)
 
 if(!user){
 return res.send("User not found")
 }
 
-const doc = new PDFDocument({
+const doc=new PDFDocument({
 layout:"landscape",
 size:"A4"
 })
@@ -259,11 +340,22 @@ doc.end()
 
 })
 
-//////////////// START //////////////////
-app.get("/", (req,res)=>{
-res.sendFile(__dirname + "/login.html")
+
+// ==============================
+// HOME ROUTE
+// ==============================
+
+app.get("/",(req,res)=>{
+res.sendFile(path.join(__dirname,"login.html"))
 })
 
-app.listen(5000,()=>{
-console.log("Server running on http://localhost:5000")
+
+// ==============================
+// SERVER START
+// ==============================
+
+const PORT = process.env.PORT || 5000
+
+app.listen(PORT,()=>{
+console.log("EcoImpact Server Running on Port "+PORT)
 })
