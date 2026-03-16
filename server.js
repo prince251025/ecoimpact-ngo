@@ -201,6 +201,8 @@ type:"Proof Approved",
 date:new Date()
 })
 
+updateRanking(db)
+
 }
 
 }
@@ -334,27 +336,29 @@ message:"Attendance recorded ✅"
 // Punch Out
 app.post("/punch-out",(req,res)=>{
 
-const {email} = req.body
-const db = readDB()
+const {email}=req.body
+const db=readDB()
 
-const user = db.users.find(u=>u.email===email)
+const user=db.users.find(u=>u.email===email)
 
-if(!user){
-return res.json({success:false,message:"User not found"})
-}
+if(user){
 
-user.points += 10
+user.points+=10
 
 user.history.push({
 type:"Punch Out",
 date:new Date()
 })
 
+updateRanking(db)
+
+}
+
 writeDB(db)
 
 res.json({
 success:true,
-message:"Good work today! +10 points 🌱"
+message:"You earned 10 points 🌱"
 })
 
 })
@@ -418,6 +422,35 @@ doc.end()
 app.get("/",(req,res)=>{
 res.sendFile(path.join(__dirname,"login.html"))
 })
+
+//////////////// UPDATE VOLUNTEER RANKING //////////////////
+
+function updateRanking(db){
+
+// sort users by points
+const sorted = db.users.sort((a,b)=>b.points-a.points)
+
+sorted.forEach((user,index)=>{
+
+if(index===0){
+user.badge="🥇 Gold Volunteer"
+}
+
+else if(index===1){
+user.badge="🥈 Silver Volunteer"
+}
+
+else if(index===2){
+user.badge="🥉 Bronze Volunteer"
+}
+
+else{
+user.badge="🌱 Volunteer"
+}
+
+})
+
+}
 
 
 // ==============================
