@@ -289,6 +289,76 @@ res.json({success:true})
 
 })
 
+//////////////// ATTENDANCE //////////////////
+
+// Punch In
+app.post("/punch-in",(req,res)=>{
+
+const {email} = req.body
+const db = readDB()
+
+const user = db.users.find(u=>u.email===email)
+
+if(!user){
+return res.json({success:false,message:"User not found"})
+}
+
+// prevent multiple punch-in same day
+const today = new Date().toDateString()
+
+const already = user.history.find(
+h=>h.type==="Punch In" && new Date(h.date).toDateString()===today
+)
+
+if(already){
+return res.json({success:false,message:"Already punched in today"})
+}
+
+user.attendance += 1
+
+user.history.push({
+type:"Punch In",
+date:new Date()
+})
+
+writeDB(db)
+
+res.json({
+success:true,
+message:"Attendance recorded ✅"
+})
+
+})
+
+
+// Punch Out
+app.post("/punch-out",(req,res)=>{
+
+const {email} = req.body
+const db = readDB()
+
+const user = db.users.find(u=>u.email===email)
+
+if(!user){
+return res.json({success:false,message:"User not found"})
+}
+
+user.points += 10
+
+user.history.push({
+type:"Punch Out",
+date:new Date()
+})
+
+writeDB(db)
+
+res.json({
+success:true,
+message:"Good work today! +10 points 🌱"
+})
+
+})
+
 
 // ==============================
 // CERTIFICATE GENERATOR
